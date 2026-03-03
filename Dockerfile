@@ -1,21 +1,21 @@
 
 FROM node:19-alpine3.15 as dev-deps
 WORKDIR /app
-COPY package.json package.json
-RUN yarn install --frozen-lockfile
+COPY package*.json ./
+RUN npm ci
 
 
 FROM node:19-alpine3.15 as builder
 WORKDIR /app
 COPY --from=dev-deps /app/node_modules ./node_modules
 COPY . .
-# RUN yarn test
-RUN yarn build
+# RUN npm test
+RUN npm run build
 
 FROM node:19-alpine3.15 as prod-deps
 WORKDIR /app
-COPY package.json package.json
-RUN yarn install --prod --frozen-lockfile
+COPY package*.json ./
+RUN npm ci --omit=dev
 
 
 FROM node:19-alpine3.15 as prod
